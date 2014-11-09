@@ -12,6 +12,7 @@ class selin_parser:
     - put this file (selin_parser.py) and the XLXS modifiers file in the same directory
     - in a DOS, launch:
         python selin_parser.py my_modifier_file.xlsx
+        note: ignore the warning about "Discarded range with reserved name"
     """
 
     def __init__(self):
