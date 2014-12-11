@@ -7,14 +7,16 @@ class selin_parser:
     Those steps are customized for Windows - but tested only on Mac OS X
     - install Python 2.x (last version)
         https://www.python.org/downloads/release/python-278/
-    - install openpyxl library
+    - install easy_install with Python
+        https://adesquared.wordpress.com/2013/07/07/setting-up-python-and-easy_install-on-windows-7/
+    - install openpyxl library with easy_install
         in a DOS : easy_install openpyxl
     - put this file (selin_parser.py) and the XLXS modifiers file in the same directory
-    - in a DOS, launch:
+    - in a DOS shell window, launch:
         python selin_parser.py my_modifier_file.xlsx
         (note: ignore the warning about "Discarded range with reserved name")
-    - to send the output of the program to a file, do:
         python selin_parser.py my_modifier_file.xlsx >output.txt
+        => in the current directory, the file "output.txt" can be used to fill the mod txt file. 
     """
 
     def __init__(self):
