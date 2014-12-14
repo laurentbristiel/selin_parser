@@ -1,5 +1,6 @@
 from openpyxl import load_workbook
 import sys
+import string
 
 class selin_parser:
     """
@@ -23,11 +24,11 @@ class selin_parser:
         # row 4 contains the name of the modifiers
         self._modifiers_name_row = 4
         # this range contains the list of all the characters modifiers
-        self.char_modifier_begin = 80
-        self.char_modifier_end = 120
+        self.char_modifier_col_begin = 'CD'
+        self.char_modifier_col_end = 'DR'
         # this range contains the list of all the other modifiers
-        self.other_modifier_begin = 12
-        self.other_modifier_end = 79
+        self.other_modifier_col_begin = 'L'
+        self.other_modifier_col_end = 'CB'
         # column 4 contains the name/code of the religions
         self._religion_name_col = 'D'
         # this range contains the list of all the religion
@@ -35,23 +36,26 @@ class selin_parser:
         self._religion_row_end = 279
 
     def parse_modifiers_sheet(self, file_path):
-
         wb = load_workbook(filename=file_path, data_only=True)
         ws = wb.get_sheet_by_name('Definition')
 
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             print "#################################################"
-            print ws[self._religion_name_col+str(religion_row)].value
+            print ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
             print "#################################################"
-            self.print_modifiers(ws, 'character_modifier', religion_row, self.char_modifier_begin, self.char_modifier_end)
-            self.print_modifiers(ws, 'other_modifier', religion_row, self.other_modifier_begin, self.other_modifier_end)
+            self.print_modifiers(ws, 'character_modifier', religion_row, 
+                                 self.col2num(self.char_modifier_col_begin),
+                                 self.col2num(self.char_modifier_col_end))
+            self.print_modifiers(ws, 'other_modifier', religion_row, 
+                                 self.col2num(self.other_modifier_col_begin),
+                                 self.col2num(self.other_modifier_col_end))
 
     def print_modifiers(self, ws, range_name, religion_row, begin, end):
         line_prefix = '\t\t'
         print line_prefix + range_name + ' = {'
         for col in range(begin, end):
-            header_value = ws.cell(row=self._modifiers_name_row, column=col).value
-            cell_value = ws.cell(row=religion_row, column=col).value
+            header_value = ws.cell(column=col, row=self._modifiers_name_row).value
+            cell_value = ws.cell(column=col, row=religion_row).value
             if header_value is None or cell_value == 0:
                 continue
             if isinstance(cell_value, float):
@@ -59,6 +63,13 @@ class selin_parser:
             if isinstance(cell_value, int):
                 print line_prefix + '\t' + header_value.encode('utf-8') + " = " + str(cell_value)
         print line_prefix + '}'
+
+    def col2num(self, col):
+        num = 0
+        for c in col:
+            if c in string.ascii_letters:
+                num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+        return num    
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
