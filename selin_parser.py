@@ -29,9 +29,9 @@ class selin_parser:
         self.other_modifier_begin = 12
         self.other_modifier_end = 79
         # column 4 contains the name/code of the religions
-        self._religion_name_col = 4
+        self._religion_name_col = 'D'
         # this range contains the list of all the religion
-        self._religion_row_begin = 7
+        self._religion_row_begin = 8
         self._religion_row_end = 279
 
     def parse_modifiers_sheet(self, file_path):
@@ -41,7 +41,7 @@ class selin_parser:
 
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             print "#################################################"
-            print ws.cell(row=religion_row, column=self._religion_name_col).value
+            print ws[self._religion_name_col+str(religion_row)].value
             print "#################################################"
             self.print_modifiers(ws, 'character_modifier', religion_row, self.char_modifier_begin, self.char_modifier_end)
             self.print_modifiers(ws, 'other_modifier', religion_row, self.other_modifier_begin, self.other_modifier_end)
