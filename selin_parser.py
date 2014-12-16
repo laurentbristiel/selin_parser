@@ -39,30 +39,32 @@ class selin_parser:
         wb = load_workbook(filename=file_path, data_only=True)
         ws = wb.get_sheet_by_name('Definition')
 
+        modifiers_file = open ('modifiers.txt', 'w')
+
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
-            print "#################################################"
-            print ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
-            print "#################################################"
-            self.print_modifiers(ws, 'character_modifier', religion_row,
+            modifiers_file.write("#################################################\n")
+            modifiers_file.write(ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value+'\n')
+            modifiers_file.write("#################################################\n")
+            self.write_modifiers(modifiers_file, ws, 'character_modifier', religion_row,
                                  self.col2num(self.char_modifier_col_begin),
                                  self.col2num(self.char_modifier_col_end))
-            self.print_modifiers(ws, 'other_modifier', religion_row,
+            self.write_modifiers(modifiers_file, ws, 'other_modifier', religion_row,
                                  self.col2num(self.other_modifier_col_begin),
                                  self.col2num(self.other_modifier_col_end))
 
-    def print_modifiers(self, ws, range_name, religion_row, begin, end):
+    def write_modifiers(self, modifiers_file, ws, range_name, religion_row, begin, end):
         line_prefix = '\t\t'
-        print line_prefix + range_name + ' = {'
+        modifiers_file.write(line_prefix + range_name + ' = {\n')
         for col in range(begin, end+1):
             header_value = ws.cell(column=col, row=self._modifiers_name_row).value
             cell_value = ws.cell(column=col, row=religion_row).value
             if header_value is None or cell_value == 0:
                 continue
             if isinstance(cell_value, float):
-                print line_prefix + '\t' + header_value.encode('utf-8') + " = %0.2f" % cell_value
+                modifiers_file.write(line_prefix + '\t' + header_value.encode('utf-8') + " = %0.2f\n" % cell_value)
             if isinstance(cell_value, int):
-                print line_prefix + '\t' + header_value.encode('utf-8') + " = " + str(cell_value)
-        print line_prefix + '}'
+                modifiers_file.write(line_prefix + '\t' + header_value.encode('utf-8') + " = " + str(cell_value) + '\n')
+        modifiers_file.write(line_prefix + '}\n')
 
     def col2num(self, col):
         num = 0
