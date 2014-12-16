@@ -43,17 +43,17 @@ class selin_parser:
             print "#################################################"
             print ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
             print "#################################################"
-            self.print_modifiers(ws, 'character_modifier', religion_row, 
+            self.print_modifiers(ws, 'character_modifier', religion_row,
                                  self.col2num(self.char_modifier_col_begin),
                                  self.col2num(self.char_modifier_col_end))
-            self.print_modifiers(ws, 'other_modifier', religion_row, 
+            self.print_modifiers(ws, 'other_modifier', religion_row,
                                  self.col2num(self.other_modifier_col_begin),
                                  self.col2num(self.other_modifier_col_end))
 
     def print_modifiers(self, ws, range_name, religion_row, begin, end):
         line_prefix = '\t\t'
         print line_prefix + range_name + ' = {'
-        for col in range(begin, end):
+        for col in range(begin, end+1):
             header_value = ws.cell(column=col, row=self._modifiers_name_row).value
             cell_value = ws.cell(column=col, row=religion_row).value
             if header_value is None or cell_value == 0:
