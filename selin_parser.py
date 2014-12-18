@@ -16,8 +16,7 @@ class selin_parser:
     - in a DOS shell window, launch:
         python selin_parser.py my_modifier_file.xlsx
         (note: ignore the warning about "Discarded range with reserved name")
-        python selin_parser.py my_modifier_file.xlsx >output.txt
-        => in the current directory, the file "output.txt" can be used to fill the mod txt file. 
+        => in the current directory, the file "modifiers.txt" is created and can be used to fill the mod txt file.
     """
 
     def __init__(self):
@@ -35,11 +34,9 @@ class selin_parser:
         self._religion_row_begin = 8
         self._religion_row_end = 279
 
-    def parse_modifiers_sheet(self, file_path):
-        wb = load_workbook(filename=file_path, data_only=True)
-        ws = wb.get_sheet_by_name('Definition')
+    def parse_modifiers_in_excel(self, ws):
 
-        modifiers_file = open ('modifiers.txt', 'w')
+        modifiers_file = open('modifiers.txt', 'w')
 
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             modifiers_file.write("#################################################\n")
@@ -51,6 +48,8 @@ class selin_parser:
             self.write_modifiers(modifiers_file, ws, 'other_modifier', religion_row,
                                  self.col2num(self.other_modifier_col_begin),
                                  self.col2num(self.other_modifier_col_end))
+
+        modifiers_file.close()
 
     def write_modifiers(self, modifiers_file, ws, range_name, religion_row, begin, end):
         line_prefix = '\t\t'
@@ -66,7 +65,12 @@ class selin_parser:
                 modifiers_file.write(line_prefix + '\t' + header_value.encode('utf-8') + " = " + str(cell_value) + '\n')
         modifiers_file.write(line_prefix + '}\n')
 
-    def col2num(self, col):
+    def parse_orders_in_excel(self, ws):
+        orders_file = open('orders.txt', 'w')
+        orders_file.close()
+
+    @staticmethod
+    def col2num(col):
         num = 0
         for c in col:
             if c in string.ascii_letters:
@@ -78,4 +82,7 @@ if __name__ == "__main__":
         print "usage: python selin_parser.py filename.xlsx"
     else:
         selin_parser = selin_parser()
-        selin_parser.parse_modifiers_sheet(sys.argv[1])
+        workbook = load_workbook(filename=sys.argv[1], data_only=True)
+        worksheet = workbook.get_sheet_by_name('Definition')
+        selin_parser.parse_modifiers_in_excel(worksheet)
+        selin_parser.parse_orders_in_excel(worksheet)
