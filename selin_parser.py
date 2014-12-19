@@ -5,8 +5,8 @@ import string
 
 class selin_parser:
     """
-    INSTALL
-    Those steps are customized for Windows - but tested only on Mac OS X
+    Install & Use
+    Those steps are described for Windows - but tested only on Mac OS X
     - install Python 2.x (last version)
         https://www.python.org/downloads/release/python-278/
     - install easy_install with Python
@@ -21,16 +21,14 @@ class selin_parser:
     """
 
     def __init__(self):
-        # column 4 contains the name/code of the religions
+        # column 'D' contains the name/code of the religions
         self._religion_name_col = 'D'
         # this range contains the list of all the religion
         self._religion_row_begin = 8
         self._religion_row_end = 280
 
     def parse_modifiers_in_excel(self, ws, filename):
-
         f = open(filename, 'w')
-
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             f.write("#################################################\n")
             f.write(ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value+'\n')
@@ -39,14 +37,13 @@ class selin_parser:
                                  self.col2num('CD'), self.col2num('DR'))
             self.write_modifiers(f, ws, 'other_modifier', religion_row,
                                  self.col2num('L'), self.col2num('CB'))
-
         f.close()
 
-    def write_modifiers(self, f, ws, range_name, religion_row, begin, end):
+    def write_modifiers(self, f, ws, range_name, religion_row, col_begin, col_end):
         line_prefix = '\t\t'
         f.write(line_prefix + range_name + ' = {\n')
-        for col in range(begin, end+1):
-            header_value = ws.cell(column=col, row=4).value
+        for col in range(col_begin, col_end+1):
+            header_value = ws.cell(column=col, row=4).value  # Code for modifiers on 4th row
             cell_value = ws.cell(column=col, row=religion_row).value
             if header_value is None or cell_value == 0:
                 continue
@@ -58,7 +55,6 @@ class selin_parser:
 
     def parse_mercenary_titles_in_excel(self, ws, filename):
         f = open(filename, 'w')
-
         f.write("# HOLY ORDERS\n\n")
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
@@ -86,44 +82,37 @@ class selin_parser:
 
     def parse_mercenaries_in_excel(self, ws, filename):
         f = open(filename, 'w')
-
         f.write("# Define mercenary types here now instead of in the static_composition.txt file\n" +
                 "# Also remember to tell the landed title to use this mercenary type instead.\n" +
                 "# Several titles can refer to the same type as well now.\n" +
                 "###################################################\n" +
                 "# Mercenary compositions\n" +
                 "###################################################\n\n\n" +
-
-
                 "### HOLY ORDERS ###\n\n" +
-
                 "# Total Troop Count (before levy_size)\n" +
                 "# Small religion = 550 (less than 15 provinces)\n" +
                 "# Medium religion = 850 (15-50 provinces)\n" +
                 "# Large religion = 1100 (51 provinces or more)\n\n" +
-
                 "# levy size = 3 (base)\n\n" +
-
                 "# Martial = +2\n" +
                 "# Statist = +1\n" +
                 "# Populist = -1\n" +
                 "# Scholarly = -2\n\n" +
-
                 "# Mainstream = +1\n" +
                 "# Heretical = -2\n\n")
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             self.write_mercenaries(f, ws, religion_row, self.col2num('AQ'), self.col2num('AW'))
         f.close()
 
-    def write_mercenaries(self, f, ws, religion_row, begin, end):
+    def write_mercenaries(self, f, ws, religion_row, col_begin, col_end):
         multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
         if multiplier is None or multiplier == 0:
             return  # we skip religion with no multiplier
         # else we create an entry
         rcod = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
         f.write("d_holy"+rcod+"_composition = {\n")
-        for col in range(begin, end+1):
-            header_value = ws.cell(column=col, row=5).value
+        for col in range(col_begin, col_end+1):
+            header_value = ws.cell(column=col, row=5).value   # Code are taken on 5th row
             cell_value = ws.cell(column=col, row=religion_row).value
             if header_value is None or cell_value == 0:
                 continue
