@@ -3,7 +3,7 @@ import sys
 import string
 
 
-class selin_parser:
+class SelinParser:
     """
     Install & Use
     Those steps are described for Windows - but tested only on Mac OS X
@@ -30,8 +30,9 @@ class selin_parser:
     def parse_modifiers_in_excel(self, ws, filename):
         f = open(filename, 'w')
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
+            religion_code = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
             f.write("#################################################\n")
-            f.write(ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value+'\n')
+            f.write(religion_code+'\n')
             f.write("#################################################\n")
             self.write_modifiers(f, ws, 'character_modifier', religion_row,
                                  self.col2num('CD'), self.col2num('DR'))
@@ -59,7 +60,7 @@ class selin_parser:
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
             if multiplier is None or multiplier == 0:
-                continue  # we skip religion with no multiplier
+                continue  # we skip religions with no multiplier
             rcod = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
             capital = ws.cell(column=self.col2num('AO'), row=religion_row).value
             f.write("d_holy"+rcod+" = {\n")
@@ -107,8 +108,7 @@ class selin_parser:
     def write_mercenaries(self, f, ws, religion_row, col_begin, col_end):
         multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
         if multiplier is None or multiplier == 0:
-            return  # we skip religion with no multiplier
-        # else we create an entry
+            return  # we skip religions with no multiplier
         rcod = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
         f.write("d_holy"+rcod+"_composition = {\n")
         for col in range(col_begin, col_end+1):
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print "usage: python selin_parser.py filename.xlsx"
     else:
-        selin_parser = selin_parser()
+        selin_parser = SelinParser()
         workbook = load_workbook(filename=sys.argv[1], data_only=True)
         worksheet = workbook.get_sheet_by_name('Definition')
         selin_parser.parse_modifiers_in_excel(worksheet, 'modifiers.txt')
