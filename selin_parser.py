@@ -15,8 +15,7 @@ class SelinParser:
         in a DOS : easy_install openpyxl
     - put this file (selin_parser.py) and the XLXS modifiers file in the same directory
     - in a DOS shell window, launch:
-        python selin_parser.py my_modifier_file.xlsx
-        (note: ignore the warning about "Discarded range with reserved name")
+        python -W ignore selin_parser.py my_modifier_file.xlsx
         => in the current directory, multiple TXT files are created to be used in the mod files.
     """
 
