@@ -20,6 +20,7 @@ class SelinParser:
     """
 
     def __init__(self):
+        self._version = '0.23'
         # column 'D' contains the name/code of the religions
         self._religion_name_col = 'D'
         # this range contains the list of all the religion
@@ -55,7 +56,8 @@ class SelinParser:
 
     def parse_mercenary_titles_in_excel(self, ws, filename):
         f = open(filename, 'w')
-        f.write("# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v0.22 - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n")
+        f.write("# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version
+                + " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n")
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
             if multiplier is None or multiplier <= 0:
@@ -89,7 +91,8 @@ class SelinParser:
                 "###################################################\n" +
                 "# Mercenary compositions\n" +
                 "###################################################\n\n\n" +
-                "### HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v0.22 - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!! ###\n\n" +
+                "# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version +
+                " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n" +
                 "# Total Troop Count (before levy_size)\n" +
                 "# is based on the religion's Civilization and, if relevant, Ascendant\n" +
                 "# Default levy size = 3 (base)\n\n" +
