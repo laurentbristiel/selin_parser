@@ -55,16 +55,17 @@ class SelinParser:
 
     def parse_mercenary_titles_in_excel(self, ws, filename):
         f = open(filename, 'w')
-        f.write("# HOLY ORDERS\n\n")
+        f.write("# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v0.22 - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n")
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
             multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
-            if multiplier is None or multiplier == 0:
+            if multiplier is None or multiplier <= 0:
                 continue  # we skip religions with no multiplier
             rcod = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
             capital = ws.cell(column=self.col2num('AO'), row=religion_row).value
+            color = ws.cell(column=self.col2num('EQ'), row=religion_row).value
             f.write("d_holy"+rcod+" = {\n")
-            f.write('\tcolor = { ??? }\n' +
-                    '\tcolor2 = { ??? }\n' +
+            f.write('\tcolor = { '+str(color)+' }\n' +
+                    '\tcolor2 = { 255 255 255 }\n' +
                     '\tcapital = '+str(capital)+'\n\n' +
                     '\tholy_order = yes\n' +
                     '\ttitle = "GRANDMASTER"\n' +
@@ -88,20 +89,21 @@ class SelinParser:
                 "###################################################\n" +
                 "# Mercenary compositions\n" +
                 "###################################################\n\n\n" +
-                "### HOLY ORDERS ###\n\n" +
+                "### HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v0.22 - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!! ###\n\n" +
                 "# Total Troop Count (before levy_size)\n" +
-                "# Small religion = 550 (less than 15 provinces)\n" +
-                "# Medium religion = 850 (15-50 provinces)\n" +
-                "# Large religion = 1100 (51 provinces or more)\n\n" +
-                "# levy size = 3 (base)\n\n" +
-                "# Martial = +2\n" +
+                "# is based on the religion's Civilization and, if relevant, Ascendant\n" +
+                "# Default levy size = 3 (base)\n\n" +
                 "# Statist = +1\n" +
+                "# Martial = +2\n" +
                 "# Populist = -1\n" +
+                "# Messianic = +1\n" +
+                "# Traditional = -1\n" +
                 "# Scholarly = -2\n\n" +
-                "# Mainstream = +1\n" +
-                "# Heretical = -2\n\n")
+                "# Mainstream = +2\n" +
+                "# Local = -2\n" +
+                "# Heretical = 1\n\n")
         for religion_row in range(self._religion_row_begin, self._religion_row_end):
-            self.write_mercenaries(f, ws, religion_row, self.col2num('AQ'), self.col2num('AW'))
+            self.write_mercenaries(f, ws, religion_row, self.col2num('AP'), self.col2num('AW'))
         f.close()
 
     def write_mercenaries(self, f, ws, religion_row, col_begin, col_end):
