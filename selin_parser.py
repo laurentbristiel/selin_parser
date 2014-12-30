@@ -16,7 +16,7 @@ class SelinParser:
     - in a DOS shell windo, launch:
         python -W ignore selin_parser.py modifier_file.xlsx
         => in the current directory, multiple TXT files are created.
-           They can tbe used in the mod files.
+           They can be used in the mod files.
     """
 
     def __init__(self):
