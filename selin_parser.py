@@ -7,13 +7,13 @@ class SelinParser:
     """
     Install & Use
     - install Python 2.x (last version)
-        https://www.python.org/downloads/release/python-278/
+        https://www.python.org/downloads/
     - install easy_install with Python
         https://adesquared.wordpress.com/2013/07/07/setting-up-python-and-easy_install-on-windows-7/
     - install openpyxl library with easy_install
         in a DOS shell: easy_install openpyxl
     - put this file (selin_parser.py) and the XLXS modifiers file in the same directory
-    - in a DOS shell windo, launch:
+    - in a DOS shell window, launch:
         python -W ignore selin_parser.py modifier_file.xlsx
         => in the current directory, multiple TXT files are created.
            They can be used in the mod files.
@@ -21,27 +21,26 @@ class SelinParser:
 
     def __init__(self):
         self._version = '0.23'
-        self._religion_name_col = 'D'  # contains the name/code of the religions
-        self._religion_row_begin = 8   # row of the first religion
+        self._religion_name_col = self.col2num('D')  # contains the name/code of the religions
+        self._religion_row_start = 8   # row of the first religion
         self._religion_row_end = 280   # row of the last religion
 
     def parse_modifiers_in_excel(self, ws, filename):
-        f = open(filename, 'w')
-        for religion_row in range(self._religion_row_begin, self._religion_row_end):
-            religion_code = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
-            f.write("#################################################\n" +
-                    religion_code+'\n' +
-                    "#################################################\n")
-            self.write_modifiers(f, ws, 'character_modifier', religion_row,
-                                 self.col2num('CD'), self.col2num('DR'))
-            self.write_modifiers(f, ws, 'other_modifier', religion_row,
-                                 self.col2num('L'), self.col2num('CB'))
-        f.close()
+        with open(filename, 'w') as f:
+            for religion_row in range(self._religion_row_start, self._religion_row_end):
+                religion_code = ws.cell(column=self._religion_name_col, row=religion_row).value
+                f.write("#################################################\n" +
+                        religion_code+'\n' +
+                        "#################################################\n")
+                self.write_modifiers(f, ws, 'character_modifier', religion_row,
+                                     self.col2num('CD'), self.col2num('DR'))
+                self.write_modifiers(f, ws, 'other_modifier', religion_row,
+                                     self.col2num('L'), self.col2num('CB'))
 
-    def write_modifiers(self, f, ws, range_name, current_religion_row, col_begin, col_end):
+    def write_modifiers(self, f, ws, range_name, current_religion_row, col_start, col_end):
         line_prefix = '\t\t'
         f.write(line_prefix + range_name + ' = {\n')
-        for col in range(col_begin, col_end+1):
+        for col in range(col_start, col_end+1):
             header_value = ws.cell(column=col, row=4).value  # Code for modifiers on 4th row
             cell_value = ws.cell(column=col, row=current_religion_row).value
             if header_value is None or cell_value == 0:
@@ -53,67 +52,65 @@ class SelinParser:
         f.write(line_prefix + '}\n')
 
     def parse_mercenary_titles_in_excel(self, ws, filename):
-        f = open(filename, 'w')
-        f.write("# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version
-                + " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n")
-        for religion_row in range(self._religion_row_begin, self._religion_row_end):
-            multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
-            if multiplier is None or multiplier <= 0:
-                continue  # we skip religions with no multiplier
-            rcod = ws.cell(column=self.col2num(self._religion_name_col), row=religion_row).value
-            capital = ws.cell(column=self.col2num('AO'), row=religion_row).value
-            color = ws.cell(column=self.col2num('EQ'), row=religion_row).value
-            f.write('d_holy'+rcod+' = {\n' +
-                    '\tcolor = { '+str(color)+' }\n' +
-                    '\tcolor2 = { 255 255 255 }\n' +
-                    '\tcapital = '+str(capital)+'\n\n' +
-                    '\tholy_order = yes\n' +
-                    '\ttitle = "GRANDMASTER"\n' +
-                    '\tfoa = "GRANDMASTER_FOA"\n\n' +
-                    '\t# Always exists\n' +
-                    '\tlandless = yes\n\n' +
-                    '\t# Parent Religion/Culture\n' +
-                    '\treligion = '+rcod+'\n\n' +
-                    '\t# Cannot be held as a secondary title\n' +
-                    '\tprimary = yes\n\n' +
-                    '\tstrength_growth_per_century = 0.5\n' +
-                    '\tmercenary_type = d_holy'+rcod+'_composition\n' +
-                    '}\n')
-        f.close()
+        with open(filename, 'w') as f:
+            f.write("# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version
+                    + " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n")
+            for religion_row in range(self._religion_row_start, self._religion_row_end):
+                multiplier = ws.cell(column=self.col2num('AP'), row=religion_row).value
+                if multiplier is None or multiplier <= 0:
+                    continue  # we skip religions with no multiplier
+                rcod = ws.cell(column=self._religion_name_col, row=religion_row).value
+                capital = ws.cell(column=self.col2num('AO'), row=religion_row).value
+                color = ws.cell(column=self.col2num('EQ'), row=religion_row).value
+                f.write('d_holy'+rcod+' = {\n' +
+                        '\tcolor = { '+str(color)+' }\n' +
+                        '\tcolor2 = { 255 255 255 }\n' +
+                        '\tcapital = '+str(capital)+'\n\n' +
+                        '\tholy_order = yes\n' +
+                        '\ttitle = "GRANDMASTER"\n' +
+                        '\tfoa = "GRANDMASTER_FOA"\n\n' +
+                        '\t# Always exists\n' +
+                        '\tlandless = yes\n\n' +
+                        '\t# Parent Religion/Culture\n' +
+                        '\treligion = '+rcod+'\n\n' +
+                        '\t# Cannot be held as a secondary title\n' +
+                        '\tprimary = yes\n\n' +
+                        '\tstrength_growth_per_century = 0.5\n' +
+                        '\tmercenary_type = d_holy'+rcod+'_composition\n' +
+                        '}\n')
 
     def parse_mercenaries_in_excel(self, ws, filename):
-        f = open(filename, 'w')
-        f.write("# Define mercenary types here now instead of in the static_composition.txt file\n" +
-                "# Also remember to tell the landed title to use this mercenary type instead.\n" +
-                "# Several titles can refer to the same type as well now.\n" +
-                "###################################################\n" +
-                "# Mercenary compositions\n" +
-                "###################################################\n\n\n" +
-                "# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version +
-                " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n" +
-                "# Total Troop Count (before levy_size)\n" +
-                "# is based on the religion's Civilization and, if relevant, Ascendant\n" +
-                "# Default levy size = 3 (base)\n\n" +
-                "# Statist = +1\n" +
-                "# Martial = +2\n" +
-                "# Populist = -1\n" +
-                "# Messianic = +1\n" +
-                "# Traditional = -1\n" +
-                "# Scholarly = -2\n\n" +
-                "# Mainstream = +2\n" +
-                "# Local = -2\n" +
-                "# Heretical = 1\n\n")
-        for religion_row in range(self._religion_row_begin, self._religion_row_end):
-            self.write_mercenaries(f, ws, religion_row, self.col2num('AP'), self.col2num('AW'))
-        f.close()
+        with open(filename, 'w') as f:
+            f.write("# Define mercenary types here now instead of in the static_composition.txt file\n" +
+                    "# Also remember to tell the landed title to use this mercenary type instead.\n" +
+                    "# Several titles can refer to the same type as well now.\n" +
+                    "###################################################\n" +
+                    "# Mercenary compositions\n" +
+                    "###################################################\n\n\n" +
+                    "# HOLY ORDERS AUTOMATICALLY GENERATED AND MAINTAINED BY THE SELIN PARSER v"+self._version +
+                    " - Do not edit by hand!!! If a change is required, change the python code or the source Matrix!!!\n\n" +
+                    "# Total Troop Count (before levy_size)\n" +
+                    "# is based on the religion's Civilization and, if relevant, Ascendant\n" +
+                    "# Default levy size = 3 (base)\n\n" +
+                    "# Statist = +1\n" +
+                    "# Martial = +2\n" +
+                    "# Populist = -1\n" +
+                    "# Messianic = +1\n" +
+                    "# Traditional = -1\n" +
+                    "# Scholarly = -2\n\n" +
+                    "# Mainstream = +2\n" +
+                    "# Local = -2\n" +
+                    "# Heretical = 1\n\n")
+            for religion_row in range(self._religion_row_start, self._religion_row_end):
+                self.write_mercenaries(f, ws, religion_row, self.col2num('AP'), self.col2num('AW'))
 
-    def write_mercenaries(self, f, ws, current_religion_row, col_begin, col_end):
+    def write_mercenaries(self, f, ws, current_religion_row, col_start, col_end):
         multiplier = ws.cell(column=self.col2num('AP'), row=current_religion_row).value
         if multiplier is None or multiplier == 0:
             return  # we skip religions with no multiplier
-        rcod = ws.cell(column=self.col2num(self._religion_name_col), row=current_religion_row).value
+        rcod = ws.cell(column=self._religion_name_col, row=current_religion_row).value
         f.write("d_holy"+rcod+"_composition = {\n")
-        for col in range(col_begin, col_end+1):
+        for col in range(col_start, col_end+1):
             header_value = ws.cell(column=col, row=5).value   # Code are taken on 5th row
             cell_value = ws.cell(column=col, row=current_religion_row).value
             if header_value is None or cell_value == 0:
@@ -133,7 +130,7 @@ class SelinParser:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "usage: python  -W ignore selin_parser.py modifier_file.xlsx"
+        print "usage: python -W ignore selin_parser.py modifier_file.xlsx"
     else:
         selin_parser = SelinParser()
         workbook = load_workbook(filename=sys.argv[1], data_only=True)
